@@ -4,7 +4,11 @@ I got bored, and thought this would be a cool visual project!
 
 ## Usage
 
-`./app --path /path/to/your/binary --out /path/to/output.png`
+With a file:
+`./app --input /path/to/your/binary --out /path/to/output.png`
+
+With a message:
+`./app --input "a custom message here" --out /path/to/output.png`
 
 ## Example
 

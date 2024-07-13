@@ -11,9 +11,10 @@ use image::{bits_to_image_buf, bits_to_image_dimensions};
 
 fn main() {
     let args = Args::parse();
-    let file = fs::read(args.path).unwrap();
+    let file = fs::read(args.input.clone()).unwrap_or(args.input.clone().into_bytes());
     let bits = bytes_to_bits(file);
-    let (width, height) = bits_to_image_dimensions(bits.len());
+    let (width, height) = bits_to_image_dimensions(bits.len(), args.width, args.height);
+
     let image_buf = bits_to_image_buf(width, height, bits);
 
     image_buf

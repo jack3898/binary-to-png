@@ -16,10 +16,37 @@ pub fn bits_to_image_buf(width: u32, height: u32, bits: Vec<bool>) -> DynamicIma
     return DynamicImage::from(image);
 }
 
-pub fn bits_to_image_dimensions(bit_len: usize) -> (u32, u32) {
-    let sqrt_of_byte_length = (bit_len as f64).sqrt().ceil() as u32;
+/// Using the bit length, get the optimal image dimensions
+/// If a height is provided, then the width calculated to satisfy the height
+/// If a width is provided, then the height is calculated to satisfy the width
+/// If both the width and height are provided, the bit length is discarded, and they are re-returned.
+pub fn bits_to_image_dimensions(
+    bit_len: usize,
+    width: Option<u32>,
+    height: Option<u32>,
+) -> (u32, u32) {
+    let bit_len = bit_len as u32;
 
-    (sqrt_of_byte_length, sqrt_of_byte_length)
+    let (final_width, final_height) = match (width, height) {
+        (Some(width), Some(height)) => (width, height),
+        (Some(width), None) => {
+            let auto_height = (bit_len as f64 / width as f64).ceil() as u32;
+
+            (width, auto_height)
+        }
+        (None, Some(height)) => {
+            let auto_width = (bit_len as f64 / height as f64).ceil() as u32;
+
+            (auto_width, height)
+        }
+        (None, None) => {
+            let bit_len_sqrt = (bit_len as f64).sqrt().ceil() as u32;
+
+            (bit_len_sqrt, bit_len_sqrt)
+        }
+    };
+
+    (final_width, final_height)
 }
 
 #[cfg(test)]
@@ -28,16 +55,31 @@ mod tests {
 
     #[test]
     fn should_get_best_image_size_for_byte_length_moderate_fill() {
-        assert_eq!(bits_to_image_dimensions(26), (6, 6));
+        assert_eq!(bits_to_image_dimensions(26, None, None), (6, 6));
     }
 
     #[test]
     fn should_get_best_image_size_for_byte_length_fill() {
-        assert_eq!(bits_to_image_dimensions(36), (6, 6));
+        assert_eq!(bits_to_image_dimensions(36, None, None), (6, 6));
     }
 
     #[test]
     fn should_get_best_image_size_for_byte_length_1_too_many() {
-        assert_eq!(bits_to_image_dimensions(37), (7, 7));
+        assert_eq!(bits_to_image_dimensions(37, None, None), (7, 7));
+    }
+
+    #[test]
+    fn should_override_height_and_calculate_width() {
+        assert_eq!(bits_to_image_dimensions(8, Some(1), None), (1, 8));
+    }
+
+    #[test]
+    fn should_override_width_and_calculate_height() {
+        assert_eq!(bits_to_image_dimensions(8, None, Some(1)), (8, 1));
+    }
+
+    #[test]
+    fn should_override_width_and_height() {
+        assert_eq!(bits_to_image_dimensions(8, Some(10), Some(10)), (10, 10));
     }
 }
