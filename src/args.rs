@@ -6,4 +6,7 @@ use clap::Parser;
 pub struct Args {
     #[arg(short, long)]
     pub path: PathBuf,
+
+    #[arg(short, long)]
+    pub out: PathBuf,
 }
