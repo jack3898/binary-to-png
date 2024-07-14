@@ -1,9 +1,9 @@
-use image::{ColorType, DynamicImage, GenericImage, GenericImageView, Rgba};
+use image::{DynamicImage, GrayImage, Luma};
 
 pub fn bits_to_image_buf(width: u32, height: u32, bits: Vec<bool>) -> DynamicImage {
-    let mut image = DynamicImage::new(width, height, ColorType::Rgba8);
-    let black_pixel = Rgba([0, 0, 0, 255]);
-    let white_pixel = Rgba([255, 255, 255, 255]);
+    let mut image = GrayImage::new(width, height);
+    let black_pixel = Luma([0]);
+    let white_pixel = Luma([255]);
 
     for (index, bit) in bits.into_iter().enumerate() {
         let x = (index as u32) % width;
@@ -11,6 +11,20 @@ pub fn bits_to_image_buf(width: u32, height: u32, bits: Vec<bool>) -> DynamicIma
         let white_or_black_pixel = if bit { white_pixel } else { black_pixel };
 
         image.put_pixel(x, y, white_or_black_pixel);
+    }
+
+    return DynamicImage::from(image);
+}
+
+pub fn bytes_to_image_buf(width: u32, height: u32, bytes: Vec<u8>) -> DynamicImage {
+    let mut image = GrayImage::new(width, height);
+
+    for (index, byte) in bytes.into_iter().enumerate() {
+        let x = (index as u32) % width;
+        let y = (index as u32) / width;
+        let grey_pixel = Luma([byte]);
+
+        image.put_pixel(x, y, grey_pixel);
     }
 
     return DynamicImage::from(image);
@@ -49,7 +63,8 @@ pub fn bits_to_image_dimensions(
     (final_width, final_height)
 }
 
-pub fn image_to_bits(image: DynamicImage) -> Vec<bool> {
+/// This function does not read the image file as-is into bits, it parses each pixel value as a binary representation
+pub fn image_to_bits(image: GrayImage) -> Vec<bool> {
     let width = image.width();
     let height = image.height();
     let mut bits = Vec::with_capacity((width * height) as usize);
@@ -63,7 +78,7 @@ pub fn image_to_bits(image: DynamicImage) -> Vec<bool> {
     bits
 }
 
-pub fn pixel_to_bool(pixel: Rgba<u8>) -> bool {
+pub fn pixel_to_bool(pixel: &Luma<u8>) -> bool {
     pixel.0[0] > 127 // Assumed black and white, so we only check red channel
 }
 
