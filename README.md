@@ -22,11 +22,16 @@ With a message:
 
 ## Flags
 
+Required:
+
 - `--input` | `-i`: Path to input or a textual message
 - `--output` | `-o`: Path to the destination where the generated file will go
+
+Optional:
+
+- `--reverse` | `-r`: Go into reverse mode, and convert the PNG back to a file
 - `--width` | `-w`: If you're generating the binary PNG, force a width
 - `--height` | `-h`: If you're generating the binary PNG, force a height
-- `--reverse` | `-r`: Go into reverse mode, and convert the PNG back to a file
 - `--bitmode` | `-b`: Use bitmode, each pixel represents a bit (black/white) instead of a byte (grayscale)
   - This is not recommended because the image crate does not provide an option to store the PNG with a bit depth of 1 and it's slower
   - You can use an online tool like squoosh (https://squoosh.app) to convert the PNG to a bit depth of 1
