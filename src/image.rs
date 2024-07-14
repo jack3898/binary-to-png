@@ -1,4 +1,4 @@
-use image::{ColorType, DynamicImage, GenericImage, Rgba};
+use image::{ColorType, DynamicImage, GenericImage, GenericImageView, Rgba};
 
 pub fn bits_to_image_buf(width: u32, height: u32, bits: Vec<bool>) -> DynamicImage {
     let mut image = DynamicImage::new(width, height, ColorType::Rgba8);
@@ -49,8 +49,26 @@ pub fn bits_to_image_dimensions(
     (final_width, final_height)
 }
 
+pub fn image_to_bits(image: DynamicImage) -> Vec<bool> {
+    let width = image.width();
+    let height = image.height();
+    let mut bits = Vec::with_capacity((width * height) as usize);
+
+    for y in 0..height {
+        for x in 0..width {
+            bits.push(pixel_to_bool(image.get_pixel(x, y)))
+        }
+    }
+
+    bits
+}
+
+pub fn pixel_to_bool(pixel: Rgba<u8>) -> bool {
+    pixel.0[0] > 127 // Assumed black and white, so we only check red channel
+}
+
 #[cfg(test)]
-mod tests {
+mod test_bits_to_image_dimensions {
     use crate::image::bits_to_image_dimensions;
 
     #[test]

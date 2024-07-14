@@ -8,11 +8,14 @@ pub struct Args {
     pub input: String,
 
     #[arg(short, long)]
-    pub out: PathBuf,
+    pub output: PathBuf,
 
     #[arg(short, long)]
     pub width: Option<u32>,
 
     #[arg(short, long)]
     pub height: Option<u32>,
+
+    #[arg(short, long, default_value = "false")]
+    pub reverse: bool,
 }
